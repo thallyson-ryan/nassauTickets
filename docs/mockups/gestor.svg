@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="620" viewBox="0 0 800 620" font-family="system-ui, Segoe UI, Arial, sans-serif">
+  <title>Mockup — Gestor</title>
+  <rect width="800" height="620" fill="#f5f7f6"/>
+  <text x="40" y="58" font-size="30" font-weight="700" fill="#12355b">nassauTickets</text>
+  <text x="40" y="110" font-size="22" font-weight="700" fill="#1b1f23">Relatórios</text>
+  <g font-size="15" fill="#1b1f23">
+    <text x="40" y="146">Período</text><rect x="102" y="128" width="96" height="28" rx="4" fill="#fff" stroke="#999"/><text x="112" y="147">Diário ▾</text>
+    <text x="222" y="146">Data</text><rect x="262" y="128" width="130" height="28" rx="4" fill="#fff" stroke="#999"/><text x="272" y="147">26/11/2026</text>
+  </g>
+  <g text-anchor="middle">
+    <rect x="40" y="172" width="170" height="74" rx="6" fill="#fff"/><text x="125" y="198" font-size="14" fill="#1b1f23">Emitidas</text><text x="125" y="232" font-size="26" font-weight="700" fill="#12355b">42</text>
+    <rect x="224" y="172" width="170" height="74" rx="6" fill="#fff"/><text x="309" y="198" font-size="14" fill="#1b1f23">Atendidas</text><text x="309" y="232" font-size="26" font-weight="700" fill="#12355b">38</text>
+    <rect x="408" y="172" width="170" height="74" rx="6" fill="#fff"/><text x="493" y="198" font-size="14" fill="#1b1f23">Tempo médio</text><text x="493" y="232" font-size="26" font-weight="700" fill="#12355b">6 min</text>
+  </g>
+  <text x="40" y="280" font-size="17" font-weight="700" fill="#1b1f23">Por prioridade</text>
+  <g font-size="14" fill="#1b1f23">
+    <rect x="40" y="290" width="720" height="30" fill="#12355b"/>
+    <text x="52" y="310" fill="#fff">Tipo</text><text x="240" y="310" fill="#fff">Emitidas</text><text x="420" y="310" fill="#fff">Atendidas</text><text x="600" y="310" fill="#fff">TM</text>
+    <rect x="40" y="320" width="720" height="28" fill="#fff"/><text x="52" y="339">Prioritária (SP)</text><text x="240" y="339">10</text><text x="420" y="339">9</text><text x="600" y="339">14 min</text>
+    <rect x="40" y="348" width="720" height="28" fill="#f0f2f1"/><text x="52" y="367">Retirada de exames (SE)</text><text x="240" y="367">12</text><text x="420" y="367">12</text><text x="600" y="367">1 min</text>
+    <rect x="40" y="376" width="720" height="28" fill="#fff"/><text x="52" y="395">Geral (SG)</text><text x="240" y="395">20</text><text x="420" y="395">17</text><text x="600" y="395">5 min</text>
+  </g>
+  <text x="40" y="434" font-size="14" fill="#555">Em seguida: relatório detalhado e auditoria (atendente, guichê, chamadas, início e fim).</text>
+  <line x1="40" y1="452" x2="760" y2="452" stroke="#ddd"/>
+  <text x="40" y="486" font-size="17" font-weight="700" fill="#1b1f23">Cadastrar atendente</text>
+  <g font-size="14" fill="#1b1f23">
+    <rect x="40" y="498" width="170" height="30" rx="4" fill="#fff" stroke="#999"/><text x="50" y="518" fill="#999">Nome</text>
+    <rect x="220" y="498" width="140" height="30" rx="4" fill="#fff" stroke="#999"/><text x="230" y="518" fill="#999">Login</text>
+    <rect x="370" y="498" width="140" height="30" rx="4" fill="#fff" stroke="#999"/><text x="380" y="518" fill="#999">Senha (8+)</text>
+    <rect x="520" y="498" width="110" height="30" rx="4" fill="#fff" stroke="#999"/><text x="530" y="518">Atendente ▾</text>
+  </g>
+  <rect x="640" y="496" width="120" height="34" rx="6" fill="#12355b"/><text x="700" y="518" font-size="14" fill="#fff" text-anchor="middle">Cadastrar</text>
+  <text x="40" y="572" font-size="17" font-weight="700" fill="#1b1f23">Expediente</text>
+  <rect x="160" y="552" width="200" height="32" rx="6" fill="#fff" stroke="#12355b" stroke-width="2"/><text x="260" y="573" font-size="14" fill="#12355b" text-anchor="middle">Descartar fila restante</text>
+</svg>
