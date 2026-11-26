@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import useAtualizacao from '../hooks/useAtualizacao.js';
 import { ultimasChamadas } from '../services/api.js';
 import { TIPOS } from '../services/constantes.js';
@@ -30,7 +30,6 @@ const chaveChamada = (s) => `${s.numero}|${s.chamada_em}`;
 export default function Painel() {
   const { dados, erro, atualizadoEm } = useAtualizacao(buscarComCache, 3000);
   const chamadas = dados ?? lerCache();
-  const [somAtivo, setSomAtivo] = useState(false);
   const anunciadas = useRef(null); // chamadas já anunciadas (ou já existentes ao abrir o painel)
 
   useEffect(() => {
@@ -43,28 +42,13 @@ export default function Painel() {
     const novas = dados.filter((s) => !anunciadas.current.has(chaveChamada(s))).reverse(); // mais antiga primeiro
     novas.forEach((s) => {
       anunciadas.current.add(chaveChamada(s));
-      if (somAtivo) falarChamada(s, s.guiche, Boolean(s.repetida));
+      falarChamada(s, s.guiche, Boolean(s.repetida));
     });
-  }, [dados, somAtivo]);
-
-  // Navegadores só liberam áudio depois de um clique na página
-  function ativarSom() {
-    setSomAtivo(true);
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.speak(Object.assign(new SpeechSynthesisUtterance('Som ativado'), { lang: 'pt-BR' }));
-    }
-  }
+  }, [dados]);
 
   return (
     <section aria-labelledby="p-titulo">
-      <div className="linha entre">
-        <h2 id="p-titulo">Últimas senhas chamadas</h2>
-        {somAtivo ? (
-          <span role="status">🔊 Som ativado</span>
-        ) : (
-          <button onClick={ativarSom}>🔈 Ativar som</button>
-        )}
-      </div>
+      <h2 id="p-titulo">Últimas senhas chamadas</h2>
       <AvisoConexao erro={erro} atualizadoEm={atualizadoEm} />
       {chamadas.length === 0 ? (
         <p>Nenhuma senha chamada ainda.</p>

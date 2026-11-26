@@ -13,11 +13,9 @@ O objetivo é praticar desenvolvimento Web com React, organização de projeto, 
 
 | Nome | Matrícula | Papel |
 |------|-----------|-------|
-| Nome do aluno | 000000 | Scrum Master |
-| Nome do aluno | 000000 | Documentador |
-| Nome do aluno | 000000 | Desenvolvedor |
-| Nome do aluno | 000000 | Desenvolvedor |
-| Nome do aluno | 000000 | Testador |
+| Thallyson Ryan Araujo de Moraes | 01855140 | Scrum Master / Desenvolvedor |
+| Caio Gabriel Vilela Ferreira | 01858920 | Documentador |
+| Richardyson Camilo Santos de Melo | 01644391 | Testador |
 
 ## Tecnologias
 
