@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="520" viewBox="0 0 800 520" font-family="system-ui, Segoe UI, Arial, sans-serif">
+  <title>Mockup — Totem</title>
+  <rect width="800" height="520" fill="#f5f7f6"/>
+  <text x="40" y="58" font-size="30" font-weight="700" fill="#12355b">nassauTickets</text>
+  <g font-size="15">
+    <rect x="384" y="34" width="84" height="36" rx="6" fill="#12355b"/><text x="426" y="57" fill="#fff" text-anchor="middle">Totem</text>
+    <rect x="476" y="34" width="84" height="36" rx="6" fill="#fff" stroke="#12355b" stroke-width="2"/><text x="518" y="57" fill="#12355b" text-anchor="middle">Painel</text>
+    <rect x="568" y="34" width="100" height="36" rx="6" fill="#fff" stroke="#12355b" stroke-width="2"/><text x="618" y="57" fill="#12355b" text-anchor="middle">Atendente</text>
+  </g>
+  <text x="40" y="130" font-size="24" font-weight="700" fill="#1b1f23">Retire sua senha</text>
+  <g font-size="20" fill="#fff" text-anchor="middle">
+    <rect x="40" y="160" width="220" height="110" rx="8" fill="#12355b"/><text x="150" y="210">Prioritária</text><text x="150" y="240" font-size="16">(SP)</text>
+    <rect x="290" y="160" width="220" height="110" rx="8" fill="#12355b"/><text x="400" y="210">Retirada de exames</text><text x="400" y="240" font-size="16">(SE)</text>
+    <rect x="540" y="160" width="220" height="110" rx="8" fill="#12355b"/><text x="650" y="210">Geral</text><text x="650" y="240" font-size="16">(SG)</text>
+  </g>
+  <rect x="40" y="300" width="720" height="90" rx="8" fill="#fff" stroke="#1f7a5a" stroke-width="2"/>
+  <text x="64" y="340" font-size="18" fill="#1b1f23">Sua senha:</text>
+  <text x="170" y="342" font-size="28" font-weight="700" fill="#12355b">261126-SG004</text>
+  <text x="64" y="372" font-size="16" fill="#1b1f23">Aguarde ser chamado no painel.</text>
+  <text x="40" y="440" font-size="14" fill="#555">Botões grandes, sem pedir dados pessoais (LGPD). Após emitir, a senha aparece em destaque.</text>
+  <text x="40" y="464" font-size="14" fill="#555">Sem conexão: "Não foi possível emitir a senha agora. Procure a recepção."</text>
+</svg>

@@ -32,6 +32,8 @@ export default function App() {
   const visiveis = TELAS.filter((t) => !t.perfil || sessao?.perfil === t.perfil);
   const atual = TELAS.find((t) => t.chave === tela);
   const precisaLogin = (atual.login || atual.perfil) && !sessao;
+  // Tela restrita a um perfil (ex.: #gestor digitado no endereço por um atendente comum)
+  const semPermissao = !precisaLogin && atual.perfil && sessao?.perfil !== atual.perfil;
 
   return (
     <main>
@@ -57,7 +59,10 @@ export default function App() {
       {tela === 'painel' && <Painel />}
       {precisaLogin && <Login onEntrar={setSessao} />}
       {!precisaLogin && tela === 'atendente' && <Atendente />}
-      {!precisaLogin && tela === 'gestor' && <Gestor />}
+      {semPermissao && (
+        <p className="alerta" role="alert">Esta tela é restrita ao perfil gestor.</p>
+      )}
+      {!precisaLogin && !semPermissao && tela === 'gestor' && <Gestor />}
     </main>
   );
 }

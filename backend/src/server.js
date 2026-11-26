@@ -20,7 +20,9 @@ const pool = mysql.createPool({
 const pad = (n, l = 2) => String(n).padStart(l, '0');
 const hoje = (d = new Date()) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 const agora = (d = new Date()) => `${hoje(d)} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-const emExpediente = () => { const h = new Date().getHours(); return h >= 7 && h < 17; }; // 07h–17h
+// Com milissegundos: ordena chamadas feitas no mesmo segundo
+const agoraMs = (d = new Date()) => `${agora(d)}.${pad(d.getMilliseconds(), 3)}`;
+const emExpediente =() => { const h = new Date().getHours(); return h >= 7 && h < 17; }; // 07h–17h
 
 // Executa em transação (rollback automático em erro)
 async function tx(fn) {
@@ -86,7 +88,7 @@ app.get('/api/painel', rota(async (_q, res) => {
     `SELECT numero, tipo, guiche, estado, COALESCE(segunda_chamada, primeira_chamada) AS chamada_em,
             segunda_chamada IS NOT NULL AS repetida
      FROM senhas WHERE data=? AND primeira_chamada IS NOT NULL AND estado <> 'NAO_COMPARECEU'
-     ORDER BY chamada_em DESC LIMIT 5`, [hoje()]);
+     ORDER BY chamada_em DESC, id DESC LIMIT 5`, [hoje()]);
   res.json(rows);
 }));
 
@@ -108,7 +110,7 @@ app.post('/api/atendimento/chamar', auth(), rota(async (req, res) => {
         `SELECT * FROM senhas WHERE data=? AND tipo=? AND estado='AGUARDANDO' ORDER BY seq LIMIT 1`, [hoje(), tipo]);
       if (!s) continue;
       await c.query(`UPDATE senhas SET estado='CHAMADA', guiche=?, usuario_id=?, primeira_chamada=? WHERE id=?`,
-        [guiche, req.user.id, agora(), s.id]);
+        [guiche, req.user.id, agoraMs(), s.id]);
       await c.query('UPDATE controle_fila SET proxima_sp=? WHERE id=1', [tipo !== 'SP']);
       return { numero: s.numero, tipo, guiche, estado: 'CHAMADA' };
     }
@@ -128,7 +130,7 @@ function transicao(nome, de, para, extra) {
     res.json({ numero: req.params.numero, estado: para });
   }));
 }
-transicao('chamar-novamente', ['CHAMADA'], 'CHAMADA_NOVAMENTE', 'segunda_chamada=NOW()');
+transicao('chamar-novamente', ['CHAMADA'], 'CHAMADA_NOVAMENTE', 'segunda_chamada=NOW(3)');
 transicao('iniciar', ['CHAMADA', 'CHAMADA_NOVAMENTE'], 'EM_ATENDIMENTO', 'inicio_atendimento=NOW()');
 transicao('finalizar', ['EM_ATENDIMENTO'], 'ATENDIDA', 'fim_atendimento=NOW()');
 transicao('nao-compareceu', ['CHAMADA_NOVAMENTE'], 'NAO_COMPARECEU', "motivo='AUSENTE'");
@@ -200,6 +202,17 @@ app.use((e, _q, res, _n) => {
 });
 
 // ---------- Inicialização ----------
+// Atualiza bancos criados antes de as chamadas guardarem milissegundos
+async function migrar() {
+  const [[col]] = await pool.query(
+    `SELECT DATETIME_PRECISION AS p FROM information_schema.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'senhas' AND COLUMN_NAME = 'primeira_chamada'`);
+  if (col && col.p < 3) {
+    await pool.query('ALTER TABLE senhas MODIFY primeira_chamada DATETIME(3) NULL, MODIFY segunda_chamada DATETIME(3) NULL');
+    console.log('Banco atualizado: horários de chamada com milissegundos.');
+  }
+}
+
 async function semear() {
   const [[{ n }]] = await pool.query('SELECT COUNT(*) AS n FROM usuarios');
   if (n === 0 && process.env.GESTOR_SENHA) {
@@ -215,5 +228,5 @@ const servidor = SSL_KEY && SSL_CERT
   : http.createServer(app); // em produção use HTTPS direto ou via proxy reverso
 servidor.listen(PORT, async () => {
   console.log(`API em ${SSL_KEY ? 'https' : 'http'}://localhost:${PORT}`);
-  try { await semear(); await descartarFila(); } catch (e) { console.error('Banco indisponível na inicialização:', e.code); }
+  try { await migrar(); await semear(); await descartarFila(); } catch (e) { console.error('Banco indisponível na inicialização:', e.code); }
 });

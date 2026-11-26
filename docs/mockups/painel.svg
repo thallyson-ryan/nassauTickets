@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="560" viewBox="0 0 800 560" font-family="system-ui, Segoe UI, Arial, sans-serif">
+  <title>Mockup — Painel</title>
+  <rect width="800" height="560" fill="#f5f7f6"/>
+  <text x="40" y="58" font-size="30" font-weight="700" fill="#12355b">nassauTickets</text>
+  <text x="40" y="120" font-size="24" font-weight="700" fill="#1b1f23">Últimas senhas chamadas</text>
+  <rect x="40" y="145" width="720" height="90" rx="8" fill="#12355b"/>
+  <text x="66" y="190" font-size="34" font-weight="700" fill="#fff">261126-SP003</text>
+  <text x="66" y="220" font-size="15" fill="#fff" opacity=".85">Prioritária</text>
+  <text x="734" y="202" font-size="34" font-weight="700" fill="#fff" text-anchor="end">Guichê 2</text>
+  <g font-size="22" fill="#1b1f23">
+    <rect x="40" y="250" width="720" height="58" rx="6" fill="#fff"/>
+    <text x="66" y="280">261126-SE002</text><text x="66" y="299" font-size="13" fill="#555">Retirada de exames</text><text x="734" y="287" text-anchor="end">Guichê 1</text>
+    <rect x="40" y="318" width="720" height="58" rx="6" fill="#fff"/>
+    <text x="66" y="348">261126-SG004</text><text x="66" y="367" font-size="13" fill="#555">Geral — última chamada</text><text x="734" y="355" text-anchor="end">Guichê 3</text>
+    <rect x="40" y="386" width="720" height="58" rx="6" fill="#fff"/>
+    <text x="66" y="416">261126-SP002</text><text x="66" y="435" font-size="13" fill="#555">Prioritária</text><text x="734" y="423" text-anchor="end">Guichê 1</text>
+    <rect x="40" y="454" width="720" height="58" rx="6" fill="#fff"/>
+    <text x="66" y="484">261126-SG003</text><text x="66" y="503" font-size="13" fill="#555">Geral</text><text x="734" y="491" text-anchor="end">Guichê 4</text>
+  </g>
+  <text x="40" y="542" font-size="14" fill="#555">Mostra só as 5 últimas chamadas (nunca a próxima) e anuncia cada chamada por áudio.</text>
+</svg>
