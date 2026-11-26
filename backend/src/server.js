@@ -85,15 +85,24 @@ app.post('/api/senhas', rota(async (req, res) => {
 
 app.get('/api/painel', rota(async (_q, res) => {
   const [rows] = await pool.query(
+    // Ordena pelo número de ordem da chamada (não pelo relógio): se a hora do computador
+    // for alterada, a chamada mais recente continua no topo do painel.
     `SELECT numero, tipo, guiche, estado, COALESCE(segunda_chamada, primeira_chamada) AS chamada_em,
-            segunda_chamada IS NOT NULL AS repetida
+            ordem_chamada AS ordem, segunda_chamada IS NOT NULL AS repetida
      FROM senhas WHERE data=? AND primeira_chamada IS NOT NULL AND estado <> 'NAO_COMPARECEU'
-     ORDER BY chamada_em DESC, id DESC LIMIT 5`, [hoje()]);
+     ORDER BY ordem_chamada DESC, id DESC LIMIT 5`, [hoje()]);
   res.json(rows);
 }));
 
 // ---------- Atendente ----------
 const ATIVOS = "('CHAMADA','CHAMADA_NOVAMENTE','EM_ATENDIMENTO')";
+
+// Próximo número de ordem de chamada. Usar dentro de tx(), com controle_fila já travada.
+async function proximaOrdem(c) {
+  await c.query('UPDATE controle_fila SET contador_chamadas = contador_chamadas + 1 WHERE id = 1');
+  const [[{ n }]] = await c.query('SELECT contador_chamadas AS n FROM controle_fila WHERE id = 1');
+  return n;
+}
 
 app.post('/api/atendimento/chamar', auth(), rota(async (req, res) => {
   const guiche = Number(req.body.guiche);
@@ -109,8 +118,8 @@ app.post('/api/atendimento/chamar', auth(), rota(async (req, res) => {
       const [[s]] = await c.query(
         `SELECT * FROM senhas WHERE data=? AND tipo=? AND estado='AGUARDANDO' ORDER BY seq LIMIT 1`, [hoje(), tipo]);
       if (!s) continue;
-      await c.query(`UPDATE senhas SET estado='CHAMADA', guiche=?, usuario_id=?, primeira_chamada=? WHERE id=?`,
-        [guiche, req.user.id, agoraMs(), s.id]);
+      await c.query(`UPDATE senhas SET estado='CHAMADA', guiche=?, usuario_id=?, primeira_chamada=?, ordem_chamada=? WHERE id=?`,
+        [guiche, req.user.id, agoraMs(), await proximaOrdem(c), s.id]);
       await c.query('UPDATE controle_fila SET proxima_sp=? WHERE id=1', [tipo !== 'SP']);
       return { numero: s.numero, tipo, guiche, estado: 'CHAMADA' };
     }
@@ -130,7 +139,18 @@ function transicao(nome, de, para, extra) {
     res.json({ numero: req.params.numero, estado: para });
   }));
 }
-transicao('chamar-novamente', ['CHAMADA'], 'CHAMADA_NOVAMENTE', 'segunda_chamada=NOW(3)');
+// Chamar novamente também recebe um novo número de ordem: a senha volta ao topo do painel
+app.post('/api/atendimento/:numero/chamar-novamente', auth(), rota(async (req, res) => {
+  await tx(async (c) => {
+    await c.query('SELECT id FROM controle_fila WHERE id = 1 FOR UPDATE');
+    const [r] = await c.query(
+      `UPDATE senhas SET estado='CHAMADA_NOVAMENTE', segunda_chamada=NOW(3), ordem_chamada=?
+       WHERE numero=? AND usuario_id=? AND estado='CHAMADA'`,
+      [await proximaOrdem(c), req.params.numero, req.user.id]);
+    if (!r.affectedRows) throw erro(409, 'Transição inválida para o estado atual da senha');
+  });
+  res.json({ numero: req.params.numero, estado: 'CHAMADA_NOVAMENTE' });
+}));
 transicao('iniciar', ['CHAMADA', 'CHAMADA_NOVAMENTE'], 'EM_ATENDIMENTO', 'inicio_atendimento=NOW()');
 transicao('finalizar', ['EM_ATENDIMENTO'], 'ATENDIDA', 'fim_atendimento=NOW()');
 transicao('nao-compareceu', ['CHAMADA_NOVAMENTE'], 'NAO_COMPARECEU', "motivo='AUSENTE'");
@@ -210,6 +230,21 @@ async function migrar() {
   if (col && col.p < 3) {
     await pool.query('ALTER TABLE senhas MODIFY primeira_chamada DATETIME(3) NULL, MODIFY segunda_chamada DATETIME(3) NULL');
     console.log('Banco atualizado: horários de chamada com milissegundos.');
+  }
+  // Número de ordem das chamadas (painel independente do relógio)
+  const [[ordem]] = await pool.query(
+    `SELECT COUNT(*) AS n FROM information_schema.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'senhas' AND COLUMN_NAME = 'ordem_chamada'`);
+  if (!ordem.n) {
+    await pool.query('ALTER TABLE senhas ADD COLUMN ordem_chamada BIGINT NULL');
+    await pool.query('ALTER TABLE controle_fila ADD COLUMN contador_chamadas BIGINT NOT NULL DEFAULT 0');
+    // Numera as chamadas já existentes na ordem em que aconteceram
+    await pool.query('SET @n = 0');
+    await pool.query(
+      `UPDATE senhas SET ordem_chamada = (@n := @n + 1) WHERE primeira_chamada IS NOT NULL
+       ORDER BY COALESCE(segunda_chamada, primeira_chamada), id`);
+    await pool.query('UPDATE controle_fila SET contador_chamadas = (SELECT COALESCE(MAX(ordem_chamada), 0) FROM senhas) WHERE id = 1');
+    console.log('Banco atualizado: número de ordem das chamadas.');
   }
 }
 

@@ -23,9 +23,9 @@ async function buscarComCache() {
   return lista;
 }
 
-// Cada chamada é identificada pela senha + horário da chamada; "Chamar novamente"
-// muda o horário e por isso é anunciada outra vez, precedida de "Última chamada".
-const chaveChamada = (s) => `${s.numero}|${s.chamada_em}`;
+// Cada chamada é identificada pela senha + número de ordem da chamada; "Chamar novamente"
+// gera um novo número e por isso é anunciada outra vez, precedida de "Última chamada".
+const chaveChamada = (s) => `${s.numero}|${s.ordem ?? s.chamada_em}`;
 
 export default function Painel() {
   const { dados, erro, atualizadoEm } = useAtualizacao(buscarComCache, 3000);
