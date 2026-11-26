@@ -73,7 +73,10 @@ Entre na tela **Atendente** com esse usuário; pela tela **Gestor** cadastre os 
 Uma tela pode ser aberta direto pelo endereço, por exemplo `http://localhost:5173/#painel` (TV da recepção).
 Para acessar de outro dispositivo da mesma rede, rode o frontend com `npm run dev -- --host` e use o IP do computador.
 
-**Áudio do painel:** clique em **Ativar som** ao abrir o painel (o navegador só libera áudio após um clique).
+**Áudio do painel:** o painel abre com o som ligado (o botão **Desativar som** silencia, e a escolha fica salva no navegador).
+O Chrome e o Edge só liberam áudio depois de um clique na página; enquanto isso, o painel mostra o aviso
+"Clique em qualquer lugar da tela para liberar o som". Na TV da recepção, para dispensar o clique, abra o Chrome assim:
+`chrome.exe --autoplay-policy=no-user-gesture-required http://localhost:5173/#painel`
 O Windows precisa ter a voz **Português (Brasil)** instalada (Configurações → Hora e idioma → Fala → Adicionar vozes).
 Se a instalação travar, use no PowerShell aberto como administrador:
 `Add-WindowsCapability -Online -Name "Language.TextToSpeech~~~pt-BR~0.0.1.0"`
