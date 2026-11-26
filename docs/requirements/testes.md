@@ -37,12 +37,14 @@
 |----|---------------|--------|--------------------|-----------|------|------------|
 | CT17 | Últimas 5 chamadas | Fazer 6 chamadas | Painel mostra só as 5 mais recentes | ✅ | 26/11/2026 | 5 itens após 27 chamadas. |
 | CT18 | Não mostra a próxima | Observar o painel com senhas na fila | Nenhuma senha AGUARDANDO aparece | ✅ | 26/11/2026 | Com 3 senhas aguardando, nenhuma apareceu. |
-| CT19 | Áudio da chamada | Abrir o painel, clicar em "Ativar som" e fazer uma chamada | Anuncia "Senha {tipo} {número}, guichê {n}" | ✅ | 26/11/2026 | Falou "Senha prioritária 14, guichê 3" (pt-BR). Retestado no PC com a voz Maria (pt-BR) instalada: som ouvido. |
+| CT19 | Áudio da chamada | Abrir o painel, clicar uma vez na tela e fazer uma chamada | Anuncia "Senha {tipo} {número}, guichê {n}" | ✅ | 26/11/2026 | Falou "Senha prioritária 14, guichê 3" (pt-BR). Retestado no PC com a voz Maria (pt-BR) instalada: som ouvido. |
 | CT20 | Áudio da última chamada | Chamar novamente | Anuncia "Última chamada. Senha …" | ✅ | 26/11/2026 | "Última chamada. Senha prioritária 14, guichê 3". |
 | CT21 | Sem repetição | Deixar o painel aberto alguns minutos | Cada chamada é anunciada uma vez só | ✅ | 26/11/2026 | 2 chamadas → 2 anúncios em 20 s de observação. |
 | CT22 | Backend cai | Parar o backend com o painel aberto | Mantém as chamadas e mostra aviso de reconexão | ✅ | 26/11/2026 | Aviso "Sistema temporariamente indisponível. Tentando reconectar…" com o horário dos dados. Recarregando a página, as 5 chamadas continuam. |
 | CT23 | Backend volta | Religar o backend | Aviso some e o painel volta a atualizar sozinho | ✅ | 26/11/2026 | Voltou sozinho em poucos segundos. |
 | CT33 | Ligar e desligar o som | Ativar som → chamar → Desativar som → chamar → Ativar som → chamar | Só a 1ª e a 3ª chamadas são anunciadas | ✅ | 26/11/2026 | Anunciou SG026 e SG028; SG027 (som desligado) ficou em silêncio. |
+| CT34 | Som ligado ao abrir | Abrir o painel pelo endereço e fazer uma chamada sem clicar no botão de som | Painel abre com "Desativar som"; aviso para clicar na tela até o primeiro clique; chamada anunciada | ⚠️ | 26/11/2026 | Abriu com som ligado e anunciou "Senha exames 38, guichê 4" sem clicar no botão. Desligar o som e recarregar manteve desligado. O aviso de clique não pôde ser visto no navegador de teste; conferir no Chrome. |
+| CT35 | Hora do computador alterada | Fazer chamadas, atrasar o relógio do PC e chamar outra senha | A nova chamada vai para o topo do painel e é anunciada | ✅ | 26/11/2026 | Com chamadas gravadas até 16h02 e o relógio às 15h38, SG037 foi para o topo e foi anunciada, inclusive a "Última chamada". Antes da correção ela não aparecia (B04). |
 
 ## Gestor
 
@@ -73,5 +75,6 @@ Emitir e chamar senha: máximo de 22 ms e média de 16 ms em 10 medições (meta
 |----|-----------|------------|--------|------|
 | M01 | Botão "Ativar som" do painel considerado inútil. | Baixa | Revisto: removido (`bee4f02`), mas sem ele o navegador bloqueia o áudio; voltou como botão liga/desliga (`56fa1ad`) | 26/11/2026 |
 | B03 | Sem som no painel: o Windows só tinha voz em inglês (Zira). | Média | Resolvido: instalada a voz Português (Brasil) no Windows | 26/11/2026 |
+| B04 | Depois de atrasar a hora do PC, chamadas novas não apareciam no painel nem eram anunciadas: as chamadas antigas ficavam "no futuro" e ocupavam o topo. | Alta | Corrigido: o painel ordena por número de ordem da chamada, não pelo relógio (`03aaf61`) | 26/11/2026 |
 | B01 | Duas chamadas no mesmo segundo ficam com o mesmo horário; o painel pode destacar a senha errada como a mais recente. | Baixa | Corrigido: horários de chamada com milissegundos (retestado no CT16) | 26/11/2026 |
 | B02 | Atendente comum consegue abrir a tela do gestor digitando `#gestor` no endereço (os dados são bloqueados pela API). | Baixa | Corrigido: a tela mostra aviso de acesso restrito (retestado no CT24) | 26/11/2026 |
