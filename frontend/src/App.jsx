@@ -1,54 +1,63 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Totem from './components/Totem.jsx';
-import Atendente from './components/Atendente.jsx';
 import Painel from './components/Painel.jsx';
-import * as fila from './services/filaService.js';
-import { falarChamada } from './utils/audio.js';
+import Atendente from './components/Atendente.jsx';
+import Gestor from './components/Gestor.jsx';
+import Login from './components/Login.jsx';
+import { lerSessao, quandoSessaoExpirar, sair } from './services/api.js';
 
-const TELAS = { totem: 'Totem', atendente: 'Atendente', painel: 'Painel' };
+const TELAS = [
+  { chave: 'totem', nome: 'Totem' },
+  { chave: 'painel', nome: 'Painel' },
+  { chave: 'atendente', nome: 'Atendente', login: true },
+  { chave: 'gestor', nome: 'Gestor', perfil: 'GESTOR' },
+];
 
 export default function App() {
-  const [tela, setTela] = useState('totem');
-  const [estado, setEstado] = useState(fila.estadoInicial);
-  const [ultima, setUltima] = useState(null);
+  // Permite abrir uma tela direto pelo endereço, ex.: http://localhost:5173/#painel (TV da recepção)
+  const [tela, setTela] = useState(() => {
+    const hash = window.location.hash.slice(1);
+    return TELAS.some((t) => t.chave === hash) ? hash : 'totem';
+  });
+  const [sessao, setSessao] = useState(lerSessao);
 
-  const acoes = {
-    chamar(guiche) {
-      const t = fila.escolherProximo(estado);
-      if (!t) return;
-      setEstado(fila.chamarProximo(estado, guiche));
-      falarChamada(t, guiche);
-    },
-    chamarNovamente(t, guiche) {
-      setEstado(fila.chamarNovamente(estado, t.numero));
-      falarChamada(t, guiche, true);
-    },
-    iniciar: (n) => setEstado(fila.iniciarAtendimento(estado, n)),
-    finalizar: (n) => setEstado(fila.finalizarAtendimento(estado, n)),
-    naoCompareceu: (n) => setEstado(fila.naoCompareceu(estado, n)),
-  };
+  // Token expirado ou inválido: volta para o login
+  useEffect(() => quandoSessaoExpirar(() => setSessao(null)), []);
 
-  function emitir(tipo) {
-    const novo = fila.emitir(estado, tipo);
-    setEstado(novo);
-    setUltima(novo.tickets.at(-1));
+  function encerrarSessao() {
+    sair();
+    setSessao(null);
   }
+
+  const visiveis = TELAS.filter((t) => !t.perfil || sessao?.perfil === t.perfil);
+  const atual = TELAS.find((t) => t.chave === tela);
+  const precisaLogin = (atual.login || atual.perfil) && !sessao;
 
   return (
     <main>
       <header>
         <h1>nassauTickets</h1>
         <nav aria-label="Telas">
-          {Object.entries(TELAS).map(([chave, nome]) => (
-            <button key={chave} aria-pressed={tela === chave} onClick={() => setTela(chave)}>
-              {nome}
+          {visiveis.map((t) => (
+            <button key={t.chave} aria-pressed={tela === t.chave} onClick={() => setTela(t.chave)}>
+              {t.nome}
             </button>
           ))}
         </nav>
       </header>
-      {tela === 'totem' && <Totem onEmitir={emitir} ultima={ultima} />}
-      {tela === 'atendente' && <Atendente tickets={estado.tickets} acoes={acoes} />}
-      {tela === 'painel' && <Painel tickets={estado.tickets} />}
+
+      {sessao && (
+        <p className="sessao">
+          Conectado como <strong>{sessao.nome}</strong> ({sessao.perfil.toLowerCase()}){' '}
+          <button onClick={encerrarSessao}>Sair</button>
+        </p>
+      )}
+
+      {tela === 'totem' && <Totem />}
+      {tela === 'painel' && <Painel />}
+      {precisaLogin && <Login onEntrar={setSessao} />}
+      {!precisaLogin && tela === 'atendente' && <Atendente />}
+      {!precisaLogin && tela === 'gestor' && <Gestor />}
     </main>
   );
 }

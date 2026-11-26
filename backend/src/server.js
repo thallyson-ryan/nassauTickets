@@ -83,7 +83,8 @@ app.post('/api/senhas', rota(async (req, res) => {
 
 app.get('/api/painel', rota(async (_q, res) => {
   const [rows] = await pool.query(
-    `SELECT numero, tipo, guiche, estado, COALESCE(segunda_chamada, primeira_chamada) AS chamada_em
+    `SELECT numero, tipo, guiche, estado, COALESCE(segunda_chamada, primeira_chamada) AS chamada_em,
+            segunda_chamada IS NOT NULL AS repetida
      FROM senhas WHERE data=? AND primeira_chamada IS NOT NULL AND estado <> 'NAO_COMPARECEU'
      ORDER BY chamada_em DESC LIMIT 5`, [hoje()]);
   res.json(rows);
