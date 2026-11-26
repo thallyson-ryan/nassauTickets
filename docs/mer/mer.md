@@ -25,12 +25,14 @@ erDiagram
         DATETIME emitida_em
         DATETIME primeira_chamada
         DATETIME segunda_chamada
+        BIGINT ordem_chamada "ordem da última chamada"
         DATETIME inicio_atendimento
         DATETIME fim_atendimento
     }
     CONTROLE_FILA {
         TINYINT id PK "sempre 1"
         BOOLEAN proxima_sp
+        BIGINT contador_chamadas
     }
 ```
 
@@ -62,15 +64,17 @@ Cada senha emitida no totem e todo o seu histórico.
 | guiche | TINYINT, opcional | Guichê que chamou. |
 | usuario_id | INT, FK, opcional | Atendente que chamou. |
 | emitida_em | DATETIME | Horário da emissão. |
-| primeira_chamada / segunda_chamada | DATETIME, opcional | Horários das chamadas. |
+| primeira_chamada / segunda_chamada | DATETIME(3), opcional | Horários das chamadas, com milissegundos. |
+| ordem_chamada | BIGINT, opcional | Número de ordem da última chamada (1ª, 2ª, 3ª…). O painel ordena por ele, e não pelo relógio, para continuar certo mesmo se a hora do computador mudar. "Chamar novamente" gera um número novo. |
 | inicio_atendimento / fim_atendimento | DATETIME, opcional | Usados no cálculo do TM. |
 
 Restrições: `UNIQUE (data, tipo, seq)` garante uma única sequência por tipo e por dia; o índice `idx_fila (data, tipo, estado, seq)` acelera a busca da próxima senha.
 
 ### controle_fila
-Tabela de uma linha só (id = 1). Tem duas funções:
+Tabela de uma linha só (id = 1). Tem três funções:
 - **Trava de concorrência:** emissão e chamada fazem `SELECT … FOR UPDATE` nesta linha, então são processadas uma de cada vez.
 - **Alternância de prioridade:** `proxima_sp` indica se a próxima chamada deve ser SP (RN01).
+- **Contador de chamadas:** `contador_chamadas` guarda o último número de ordem usado; cada chamada soma 1 e grava o valor em `senhas.ordem_chamada`.
 
 ## Relacionamento
 
