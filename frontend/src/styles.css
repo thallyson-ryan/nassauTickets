@@ -33,3 +33,4 @@ table { width: 100%; border-collapse: collapse; background: #fff; font-size: .9r
 th, td { text-align: left; padding: .4rem .6rem; border-bottom: 1px solid #dde2e5; white-space: nowrap; }
 th { background: #e8edf1; }
 .colunas { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
+.linha.entre { justify-content: space-between; }
