@@ -35,8 +35,6 @@ function lerPreferenciaSom() {
 function salvarPreferenciaSom(ativo) {
   try { localStorage.setItem(CHAVE_SOM, ativo ? 'ligado' : 'desligado'); } catch { /* opcional */ }
 }
-// navigator.userActivation indica se a página já recebeu um clique (Chrome/Edge)
-const paginaJaClicada = () => navigator.userActivation?.hasBeenActive ?? true;
 
 // Cada chamada é identificada pela senha + número de ordem da chamada; "Chamar novamente"
 // gera um novo número e por isso é anunciada outra vez, precedida de "Última chamada".
@@ -46,20 +44,7 @@ export default function Painel() {
   const { dados, erro, atualizadoEm } = useAtualizacao(buscarComCache, 3000);
   const chamadas = dados ?? lerCache();
   const [somAtivo, setSomAtivo] = useState(lerPreferenciaSom);
-  // O navegador só libera áudio depois do primeiro clique na página: até lá, mostra um aviso
-  const [precisaClique, setPrecisaClique] = useState(() => !paginaJaClicada());
   const anunciadas = useRef(null); // chamadas já anunciadas (ou já existentes ao abrir o painel)
-
-  useEffect(() => {
-    if (!precisaClique) return undefined;
-    const liberar = () => setPrecisaClique(false);
-    window.addEventListener('pointerdown', liberar, { once: true });
-    window.addEventListener('keydown', liberar, { once: true });
-    return () => {
-      window.removeEventListener('pointerdown', liberar);
-      window.removeEventListener('keydown', liberar);
-    };
-  }, [precisaClique]);
 
   useEffect(() => {
     if (!dados) return;
@@ -96,9 +81,6 @@ export default function Painel() {
           {somAtivo ? '🔇 Desativar som' : '🔈 Ativar som'}
         </button>
       </div>
-      {somAtivo && precisaClique && (
-        <p className="aviso" role="status">🔊 Clique em qualquer lugar da tela para liberar o som das chamadas.</p>
-      )}
       <AvisoConexao erro={erro} atualizadoEm={atualizadoEm} />
       {chamadas.length === 0 ? (
         <p className="cartao vazio">Nenhuma senha chamada ainda.</p>
