@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import useAtualizacao from '../hooks/useAtualizacao.js';
 import { ultimasChamadas } from '../services/api.js';
 import { TIPOS } from '../services/constantes.js';
@@ -30,6 +30,7 @@ const chaveChamada = (s) => `${s.numero}|${s.chamada_em}`;
 export default function Painel() {
   const { dados, erro, atualizadoEm } = useAtualizacao(buscarComCache, 3000);
   const chamadas = dados ?? lerCache();
+  const [somAtivo, setSomAtivo] = useState(false);
   const anunciadas = useRef(null); // chamadas já anunciadas (ou já existentes ao abrir o painel)
 
   useEffect(() => {
@@ -42,13 +43,30 @@ export default function Painel() {
     const novas = dados.filter((s) => !anunciadas.current.has(chaveChamada(s))).reverse(); // mais antiga primeiro
     novas.forEach((s) => {
       anunciadas.current.add(chaveChamada(s));
-      falarChamada(s, s.guiche, Boolean(s.repetida));
+      if (somAtivo) falarChamada(s, s.guiche, Boolean(s.repetida));
     });
-  }, [dados]);
+  }, [dados, somAtivo]);
+
+  // Navegadores só liberam áudio depois de um clique na página.
+  // Desativado, as chamadas novas só aparecem na tela (não ficam acumuladas para depois).
+  function alternarSom() {
+    const ativar = !somAtivo;
+    setSomAtivo(ativar);
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    if (ativar) {
+      window.speechSynthesis.speak(Object.assign(new SpeechSynthesisUtterance('Som ativado'), { lang: 'pt-BR' }));
+    }
+  }
 
   return (
     <section aria-labelledby="p-titulo">
-      <h2 id="p-titulo">Últimas senhas chamadas</h2>
+      <div className="linha entre">
+        <h2 id="p-titulo">Últimas senhas chamadas</h2>
+        <button aria-pressed={somAtivo} onClick={alternarSom}>
+          {somAtivo ? '🔇 Desativar som' : '🔈 Ativar som'}
+        </button>
+      </div>
       <AvisoConexao erro={erro} atualizadoEm={atualizadoEm} />
       {chamadas.length === 0 ? (
         <p>Nenhuma senha chamada ainda.</p>
