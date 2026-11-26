@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
 -- Linha única usada como trava (lock) para serializar emissão e chamada
 CREATE TABLE IF NOT EXISTS controle_fila (
   id TINYINT PRIMARY KEY,
-  proxima_sp BOOLEAN NOT NULL DEFAULT TRUE
+  proxima_sp BOOLEAN NOT NULL DEFAULT TRUE,
+  contador_chamadas BIGINT NOT NULL DEFAULT 0  -- último número de ordem de chamada usado
 );
 INSERT IGNORE INTO controle_fila (id, proxima_sp) VALUES (1, TRUE);
 
@@ -28,8 +29,9 @@ CREATE TABLE IF NOT EXISTS senhas (
   guiche TINYINT NULL,
   usuario_id INT NULL,
   emitida_em DATETIME NOT NULL,
-  primeira_chamada DATETIME(3) NULL,          -- milissegundos: ordena chamadas do mesmo segundo
+  primeira_chamada DATETIME(3) NULL,
   segunda_chamada DATETIME(3) NULL,
+  ordem_chamada BIGINT NULL,                  -- ordem da última chamada (painel não depende do relógio)
   inicio_atendimento DATETIME NULL,
   fim_atendimento DATETIME NULL,
   UNIQUE KEY uq_tipo_seq_dia (data, tipo, seq),
