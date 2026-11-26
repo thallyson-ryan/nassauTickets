@@ -20,8 +20,8 @@ O objetivo é praticar desenvolvimento Web com React, organização de projeto, 
 ## Tecnologias
 
 - Frontend: React 19 + Vite (JavaScript)
-- Backend (planejado): Node.js LTS 22 com Express. Justificativa: mesma linguagem do frontend, o que facilita o trabalho do grupo.
-- Banco de dados (planejado): MySQL 8.0
+- Backend: Node.js LTS 22 com Express. Justificativa: mesma linguagem do frontend, o que facilita o trabalho do grupo.
+- Banco de dados: MySQL 8.0
 
 ## Visão geral da arquitetura
 
@@ -38,7 +38,7 @@ Em desenvolvimento, o Vite repassa as chamadas `/api` para `http://localhost:300
 | Tela | Quem usa | O que faz |
 |------|----------|-----------|
 | Totem | Cliente (anônimo) | Emite senha SP, SE ou SG |
-| Painel | Público | Mostra as 5 últimas senhas chamadas, atualiza a cada 3 s |
+| Painel | Público | Mostra as 5 últimas senhas chamadas, atualiza a cada 3 s e anuncia cada chamada por áudio |
 | Atendente | Atendente (login) | Chama, chama novamente, inicia e encerra atendimento; marca não comparecimento |
 | Gestor | Gestor (login) | Relatórios diário/mensal, cadastro de atendentes, descarte da fila |
 
@@ -57,7 +57,7 @@ npm run dev                 # http://localhost:3000
 ```
 
 No Windows, se o comando `mysql` não for encontrado, execute o `schema.sql` pelo MySQL Workbench
-ou use o caminho completo: `"C:Program FilesMySQLMySQL Server 8.0inmysql.exe"`.
+ou use o caminho completo: `"C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe"`.
 
 **2. Frontend** (terminal 2)
 
@@ -69,6 +69,28 @@ npm run dev                 # http://localhost:5173
 
 Na primeira execução o backend cria o usuário gestor com `GESTOR_LOGIN` e `GESTOR_SENHA` do `.env`.
 Entre na tela **Atendente** com esse usuário; pela tela **Gestor** cadastre os demais atendentes.
+
+Uma tela pode ser aberta direto pelo endereço, por exemplo `http://localhost:5173/#painel` (TV da recepção).
+Para acessar de outro dispositivo da mesma rede, rode o frontend com `npm run dev -- --host` e use o IP do computador.
+
+**Áudio do painel:** clique em **Ativar som** ao abrir o painel (o navegador só libera áudio após um clique).
+O Windows precisa ter a voz **Português (Brasil)** instalada (Configurações → Hora e idioma → Fala → Adicionar vozes).
+Se a instalação travar, use no PowerShell aberto como administrador:
+`Add-WindowsCapability -Online -Name "Language.TextToSpeech~~~pt-BR~0.0.1.0"`
+
+## Documentação
+
+| Documento | Conteúdo |
+|-----------|----------|
+| [Requisitos](docs/requirements/requisitos.md) | Agentes, requisitos funcionais e não funcionais, regras de negócio |
+| [Requisitos não funcionais](docs/requirements/nao-funcionais.md) | LGPD, acessibilidade, recuperação de falhas e métricas |
+| [MER](docs/mer/mer.md) | Modelo do banco de dados |
+| [Casos de uso](docs/models/uml/casos-de-uso.md) | Diagrama e descrição dos casos de uso |
+| [Estados da senha](docs/models/uml/estados-senha.md) | Máquina de estados |
+| [Sequência da chamada](docs/models/uml/sequencia-chamada.md) | Chamada com dois atendentes ao mesmo tempo (concorrência) |
+| [Mockups](docs/mockups/mockups.md) | Esboços das telas |
+| [Branding](docs/branding/branding.md) | Logo, cores, tipografia e tom de voz |
+| [Testes](docs/requirements/testes.md) | Plano, resultados e bugs encontrados |
 
 ## Estrutura do repositório
 
@@ -85,13 +107,16 @@ frontend/   aplicação React
 
 Padrão de commits: `feat:`, `fix:`, `docs:`, `chore:`.
 
-## Status da fase 1
+## Status
 
 - [x] Estrutura, licença, .gitignore e README
-- [x] Requisitos iniciais (`docs/requirements`)
-- [x] Totem, painel e terminal do atendente (React)
+- [x] Requisitos, LGPD, acessibilidade e recuperação de falhas (`docs/requirements`)
+- [x] Totem, painel, terminal do atendente e área do gestor (React)
 - [x] Regra de prioridade, numeração e máquina de estados
-- [ ] Backend, MySQL, login/gestor, relatórios, expediente 7h–17h, concorrência, contingência
+- [x] Backend, MySQL, login/gestor, relatórios, expediente 7h–17h, concorrência, contingência
+- [x] Áudio das chamadas no painel
+- [x] MER, UML, mockups e branding (`docs/`)
+- [x] Plano e execução dos testes
 
 ## Backend (Node.js + Express + MySQL)
 
