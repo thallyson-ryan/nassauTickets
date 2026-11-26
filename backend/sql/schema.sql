@@ -28,8 +28,8 @@ CREATE TABLE IF NOT EXISTS senhas (
   guiche TINYINT NULL,
   usuario_id INT NULL,
   emitida_em DATETIME NOT NULL,
-  primeira_chamada DATETIME NULL,
-  segunda_chamada DATETIME NULL,
+  primeira_chamada DATETIME(3) NULL,          -- milissegundos: ordena chamadas do mesmo segundo
+  segunda_chamada DATETIME(3) NULL,
   inicio_atendimento DATETIME NULL,
   fim_atendimento DATETIME NULL,
   UNIQUE KEY uq_tipo_seq_dia (data, tipo, seq),
