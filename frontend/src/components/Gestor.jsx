@@ -22,7 +22,7 @@ function CadastroAtendente() {
   }
 
   return (
-    <section aria-labelledby="c-titulo">
+    <section aria-labelledby="c-titulo" className="cartao">
       <h3 id="c-titulo">Cadastrar atendente</h3>
       <form className="formulario" onSubmit={enviar}>
         <label>Nome<input name="nome" required value={form.nome} onChange={alterar} /></label>
@@ -42,7 +42,7 @@ function CadastroAtendente() {
         {retorno && (
           <p className={retorno.ok ? 'aviso' : 'alerta'} role={retorno.ok ? 'status' : 'alert'}>{retorno.texto}</p>
         )}
-        <button type="submit">Cadastrar</button>
+        <button className="grande" type="submit">Cadastrar</button>
       </form>
     </section>
   );
@@ -62,11 +62,11 @@ function Expediente() {
   }
 
   return (
-    <section aria-labelledby="e-titulo">
+    <section aria-labelledby="e-titulo" className="cartao">
       <h3 id="e-titulo">Expediente (07h às 17h)</h3>
-      <p>Após as 17h a fila restante é descartada automaticamente. Use o botão para forçar o descarte agora.</p>
-      <button onClick={encerrar}>Descartar fila restante</button>
-      {texto && <p role="status">{texto}</p>}
+      <p className="dica">Após as 17h a fila restante é descartada automaticamente. Use o botão para forçar o descarte agora.</p>
+      <button className="perigo" onClick={encerrar}>Descartar fila restante</button>
+      {texto && <p className="aviso" role="status">{texto}</p>}
     </section>
   );
 }

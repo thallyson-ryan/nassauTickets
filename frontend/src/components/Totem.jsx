@@ -2,6 +2,12 @@ import { useState } from 'react';
 import { emitirSenha } from '../services/api.js';
 import { TIPOS } from '../services/constantes.js';
 
+const DESCRICOES = {
+  SP: 'Idosos, gestantes, pessoas com deficiência',
+  SE: 'Buscar resultado de exames',
+  SG: 'Coleta e demais atendimentos',
+};
+
 // Totem de autoatendimento: o cliente (AC) é anônimo, nenhum dado pessoal é coletado (LGPD).
 export default function Totem() {
   const [ultima, setUltima] = useState(null);
@@ -24,20 +30,25 @@ export default function Totem() {
   return (
     <section aria-labelledby="t-titulo">
       <h2 id="t-titulo">Retire sua senha</h2>
-      <div className="botoes">
+      <p className="dica">Toque no tipo de atendimento. Não pedimos nenhum dado pessoal.</p>
+      <div className="opcoes">
         {Object.entries(TIPOS).map(([tipo, nome]) => (
-          <button key={tipo} className="grande" disabled={enviando} onClick={() => emitir(tipo)}>
-            {nome} ({tipo})
+          <button key={tipo} className={`opcao opcao-${tipo}`} disabled={enviando} onClick={() => emitir(tipo)}>
+            <span className="sigla">{tipo}</span>
+            <span className="nome">{nome}</span>
+            <span className="desc">{DESCRICOES[tipo]}</span>
           </button>
         ))}
       </div>
       {erro && <p className="alerta" role="alert">{erro}</p>}
       {ultima && (
-        <p className="aviso" role="status">
-          Sua senha: <strong className="senha">{ultima.numero}</strong> Aguarde ser chamado no painel.
-        </p>
+        <div className="bilhete" role="status">
+          <p className="rotulo">Sua senha</p>
+          <strong className="numero">{ultima.numero}</strong>
+          <span className={`tipo tipo-${ultima.tipo}`}>{TIPOS[ultima.tipo]}</span>
+          <p>Aguarde ser chamado no painel.</p>
+        </div>
       )}
-      {!ultima && !erro && <p>Escolha o tipo de atendimento.</p>}
     </section>
   );
 }

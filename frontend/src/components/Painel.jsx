@@ -61,27 +61,49 @@ export default function Painel() {
 
   return (
     <section aria-labelledby="p-titulo">
-      <div className="linha entre">
+      <div className="painel-topo">
         <h2 id="p-titulo">Últimas senhas chamadas</h2>
-        <button aria-pressed={somAtivo} onClick={alternarSom}>
+        <button className={somAtivo ? 'secundario' : 'grande'} aria-pressed={somAtivo} onClick={alternarSom}>
           {somAtivo ? '🔇 Desativar som' : '🔈 Ativar som'}
         </button>
       </div>
       <AvisoConexao erro={erro} atualizadoEm={atualizadoEm} />
       {chamadas.length === 0 ? (
-        <p>Nenhuma senha chamada ainda.</p>
+        <p className="cartao vazio">Nenhuma senha chamada ainda.</p>
       ) : (
-        <ol className="painel" aria-live="polite">
-          {chamadas.map((s, i) => (
-            <li key={s.numero} className={i === 0 ? 'destaque' : ''}>
-              <span>
-                {s.numero}
-                <small>{TIPOS[s.tipo]}{s.repetida ? ' — última chamada' : ''}</small>
-              </span>
-              <span>Guichê {s.guiche}</span>
-            </li>
-          ))}
-        </ol>
+        <div aria-live="polite">
+          <div className="chamada-atual">
+            <div>
+              <span className="rotulo">Senha</span>
+              <div className="numero">{chamadas[0].numero}</div>
+              <div className="extra">
+                <span className="tipo">{TIPOS[chamadas[0].tipo]}</span>
+                {Boolean(chamadas[0].repetida) && <span className="ultima">Última chamada</span>}
+              </div>
+            </div>
+            <div className="guiche">
+              <span className="rotulo">Guichê</span>
+              <strong>{chamadas[0].guiche}</strong>
+            </div>
+          </div>
+          {chamadas.length > 1 && (
+            <ol className="painel" aria-label="Chamadas anteriores">
+              {chamadas.slice(1).map((s) => (
+                <li key={s.numero}>
+                  <div>
+                    <div className="numero">{s.numero}</div>
+                    <div className="info">
+                      <span className={`tipo tipo-${s.tipo}`}>{s.tipo}</span>
+                      {TIPOS[s.tipo]}
+                      {Boolean(s.repetida) && <span className="ultima">Última chamada</span>}
+                    </div>
+                  </div>
+                  <span className="guiche">Guichê {s.guiche}</span>
+                </li>
+              ))}
+            </ol>
+          )}
+        </div>
       )}
     </section>
   );
