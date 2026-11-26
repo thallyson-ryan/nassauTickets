@@ -14,7 +14,11 @@ const TELAS = [
 ];
 
 export default function App() {
-  const [tela, setTela] = useState('totem');
+  // Permite abrir uma tela direto pelo endereço, ex.: http://localhost:5173/#painel (TV da recepção)
+  const [tela, setTela] = useState(() => {
+    const hash = window.location.hash.slice(1);
+    return TELAS.some((t) => t.chave === hash) ? hash : 'totem';
+  });
   const [sessao, setSessao] = useState(lerSessao);
 
   // Token expirado ou inválido: volta para o login
