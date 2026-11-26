@@ -61,7 +61,7 @@
 | ID | Caso de teste | Passos | Resultado esperado | Resultado | Data | Observação |
 |----|---------------|--------|--------------------|-----------|------|------------|
 | CT31 | Navegação por teclado | Usar só Tab, Enter e espaço | Todas as ações são possíveis e o foco é visível | ✅ | 26/11/2026 | Senha emitida só com Tab + Enter; foco com contorno verde de 2,4 px. |
-| CT32 | Leitor de tela | Usar NVDA ou Narrador do Windows | Títulos, botões e avisos são lidos | ⚠️ | 26/11/2026 | Verificação automática nas telas totem, painel e login: página em pt-BR, títulos H1/H2, todos os botões e campos com nome ou rótulo, avisos com role=alert/status e painel com aria-live. A leitura em voz pelo Narrador não foi feita. |
+| CT32 | Leitor de tela | Usar NVDA ou Narrador do Windows | Títulos, botões e avisos são lidos | ✅ | 26/11/2026 | Testado com o Narrador do Windows: títulos, botões e avisos das telas foram lidos. Verificação automática também ok: página em pt-BR, títulos H1/H2, botões e campos com nome ou rótulo, avisos com role=alert/status e painel com aria-live. |
 
 ## Desempenho
 
