@@ -2,7 +2,6 @@ import { useState } from 'react';
 import useAtualizacao from '../hooks/useAtualizacao.js';
 import * as api from '../services/api.js';
 import { ESTADOS, TIPOS } from '../services/constantes.js';
-import { falarChamada } from '../utils/audio.js';
 import AvisoConexao from './AvisoConexao.jsx';
 
 const GUICHES = [1, 2, 3, 4];
@@ -48,13 +47,10 @@ export default function Atendente() {
   const chamar = () => executar(async () => {
     const senha = await api.chamarProxima(guiche);
     if (!senha) setMensagem('Não há senhas na fila.');
-    else falarChamada(senha, senha.guiche);
   });
 
-  const chamarNovamente = () => executar(async () => {
-    await api.chamarNovamente(atual.numero);
-    falarChamada(atual, atual.guiche, true);
-  });
+  // O áudio da chamada é reproduzido pelo painel
+  const chamarNovamente = () => executar(() => api.chamarNovamente(atual.numero));
 
   return (
     <section aria-labelledby="a-titulo">
