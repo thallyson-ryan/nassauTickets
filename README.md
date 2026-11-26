@@ -33,24 +33,49 @@ Atendente (AA) ─┼─> Frontend React ──REST/JSON──> Backend (AS) ─
 Painel ─────────┘
 ```
 
-Na fase 1, o frontend usa `src/services/filaService.js`, que simula o Agente Sistema em memória.
-Na fase 2, esse serviço passa a consumir a API REST do backend.
+O frontend consome a API REST do backend por meio de `frontend/src/services/api.js`.
+Em desenvolvimento, o Vite repassa as chamadas `/api` para `http://localhost:3000`
+(para outro endereço, crie `frontend/.env` com `VITE_API_URL=...`).
+
+| Tela | Quem usa | O que faz |
+|------|----------|-----------|
+| Totem | Cliente (anônimo) | Emite senha SP, SE ou SG |
+| Painel | Público | Mostra as 5 últimas senhas chamadas, atualiza a cada 3 s |
+| Atendente | Atendente (login) | Chama, chama novamente, inicia e encerra atendimento; marca não comparecimento |
+| Gestor | Gestor (login) | Relatórios diário/mensal, cadastro de atendentes, descarte da fila |
 
 ## Instalação e execução
+
+Pré-requisitos: Node.js 22 e MySQL 8.0 rodando.
+
+**1. Banco e backend** (terminal 1)
+
+```bash
+cd backend
+cp .env.example .env        # preencha DB_PASSWORD, JWT_SECRET e GESTOR_SENHA
+mysql -u root -p < sql/schema.sql
+npm install
+npm run dev                 # http://localhost:3000
+```
+
+No Windows, se o comando `mysql` não for encontrado, execute o `schema.sql` pelo MySQL Workbench
+ou use o caminho completo: `"C:Program FilesMySQLMySQL Server 8.0inmysql.exe"`.
+
+**2. Frontend** (terminal 2)
 
 ```bash
 cd frontend
 npm install
-npm run dev
+npm run dev                 # http://localhost:5173
 ```
 
-Abra o endereço exibido no terminal (normalmente http://localhost:5173).
-Não há variáveis de ambiente obrigatórias nesta fase.
+Na primeira execução o backend cria o usuário gestor com `GESTOR_LOGIN` e `GESTOR_SENHA` do `.env`.
+Entre na tela **Atendente** com esse usuário; pela tela **Gestor** cadastre os demais atendentes.
 
 ## Estrutura do repositório
 
 ```
-backend/    API (fase 2)
+backend/    API REST (Express) e script do banco (sql/schema.sql)
 docs/       branding, mer, mockups, models/uml, requirements
 frontend/   aplicação React
 ```
@@ -84,5 +109,5 @@ npm run dev                 # http://localhost:3000
 - **Concorrência:** a chamada roda em transação com `SELECT ... FOR UPDATE` na tabela `controle_fila`, então dois atendentes simultâneos recebem senhas diferentes.
 - **Expediente:** emissão e chamada só entre 07h e 17h. Após as 17h a fila restante é descartada (`NAO_COMPARECEU` / `DESCARTADA_FIM_EXPEDIENTE`); atendimentos em curso são concluídos pelo atendente.
 - **Relatórios:** `GET /api/relatorios?periodo=diario|mensal&data=YYYY-MM-DD` (gestor): totais, por prioridade, detalhado, tempo médio e auditoria.
-- **Falhas:** `GET /api/saude`; erros de banco retornam 503 para o frontend e o painel exibirem aviso e tentarem de novo.
+- **Falhas:** `GET /api/saude`; erros de banco retornam 503. O painel guarda as últimas chamadas no navegador e continua exibindo-as com um aviso de "Sistema temporariamente indisponível", tentando reconectar a cada 3 s; o totem orienta o cliente a procurar a recepção.
 - **HTTPS:** defina `SSL_KEY` e `SSL_CERT` no `.env`, ou use proxy reverso (nginx).
