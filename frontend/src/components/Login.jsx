@@ -22,8 +22,9 @@ export default function Login({ onEntrar }) {
   }
 
   return (
-    <section aria-labelledby="l-titulo">
+    <section aria-labelledby="l-titulo" className="cartao centro">
       <h2 id="l-titulo">Acesso do atendente</h2>
+      <p className="dica">Entre com o login e a senha fornecidos pelo gestor.</p>
       <form className="formulario" onSubmit={enviar}>
         <label>
           Login

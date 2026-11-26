@@ -57,55 +57,67 @@ export default function Atendente() {
       <h2 id="a-titulo">Terminal do atendente</h2>
       <AvisoConexao erro={erro} atualizadoEm={atualizadoEm} />
 
-      <div className="linha">
-        <label>
-          Guichê{' '}
-          <select value={guiche} onChange={trocarGuiche} disabled={Boolean(atual)}>
-            {GUICHES.map((g) => <option key={g} value={g}>{g}</option>)}
-          </select>
-        </label>
-        <p>Na fila: <strong>{aguardando}</strong></p>
-      </div>
+      <div className="atendente">
+        <div className="cartao">
+          {mensagem && <p className="aviso" role="status">{mensagem}</p>}
 
-      {mensagem && <p className="aviso" role="status">{mensagem}</p>}
+          {!atual && (
+            <div className="vazio">
+              <p>Nenhuma senha em atendimento no guichê {guiche}.</p>
+              <button className="grande" disabled={ocupado || Boolean(erro)} onClick={chamar}>
+                Chamar próxima senha
+              </button>
+            </div>
+          )}
 
-      {!atual && (
-        <button className="grande" disabled={ocupado || Boolean(erro)} onClick={chamar}>
-          Chamar próxima senha
-        </button>
-      )}
+          {atual && (
+            <div className="atual-senha">
+              <span className="dica">Senha atual</span>
+              <strong className="numero">{atual.numero}</strong>
+              <div className="linha">
+                <span className={`tipo tipo-${atual.tipo}`}>{TIPOS[atual.tipo]}</span>
+                <span className={`estado estado-${atual.estado}`}>{ESTADOS[atual.estado]}</span>
+              </div>
+              <div className="botoes">
+                {atual.estado !== 'EM_ATENDIMENTO' && (
+                  <button className="grande" disabled={ocupado}
+                    onClick={() => executar(() => api.iniciarAtendimento(atual.numero))}>
+                    Iniciar atendimento
+                  </button>
+                )}
+                {atual.estado === 'CHAMADA' && (
+                  <button disabled={ocupado} onClick={chamarNovamente}>Chamar novamente</button>
+                )}
+                {atual.estado === 'CHAMADA_NOVAMENTE' && (
+                  <button className="perigo" disabled={ocupado}
+                    onClick={() => executar(() => api.naoCompareceu(atual.numero))}>
+                    Não compareceu
+                  </button>
+                )}
+                {atual.estado === 'EM_ATENDIMENTO' && (
+                  <button className="grande" disabled={ocupado}
+                    onClick={() => executar(() => api.finalizarAtendimento(atual.numero))}>
+                    Encerrar atendimento
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
 
-      {atual && (
-        <div className="atual">
-          <p>
-            Senha <strong className="senha">{atual.numero}</strong> ({TIPOS[atual.tipo]}) — guichê {atual.guiche}
-            <br />
-            Situação: <strong>{ESTADOS[atual.estado]}</strong>
-          </p>
-          <div className="botoes">
-            {atual.estado !== 'EM_ATENDIMENTO' && (
-              <button className="grande" disabled={ocupado}
-                onClick={() => executar(() => api.iniciarAtendimento(atual.numero))}>
-                Iniciar atendimento
-              </button>
-            )}
-            {atual.estado === 'CHAMADA' && (
-              <button disabled={ocupado} onClick={chamarNovamente}>Chamar novamente</button>
-            )}
-            {atual.estado === 'CHAMADA_NOVAMENTE' && (
-              <button disabled={ocupado} onClick={() => executar(() => api.naoCompareceu(atual.numero))}>
-                Não compareceu
-              </button>
-            )}
-            {atual.estado === 'EM_ATENDIMENTO' && (
-              <button className="grande" disabled={ocupado}
-                onClick={() => executar(() => api.finalizarAtendimento(atual.numero))}>
-                Encerrar atendimento
-              </button>
-            )}
+        <div className="cartao formulario">
+          <label>
+            Guichê
+            <select value={atual ? atual.guiche : guiche} onChange={trocarGuiche} disabled={Boolean(atual)}>
+              {GUICHES.map((g) => <option key={g} value={g}>Guichê {g}</option>)}
+            </select>
+          </label>
+          <div className="contador">
+            <strong>{aguardando}</strong>
+            <span>{aguardando === 1 ? 'senha na fila' : 'senhas na fila'}</span>
           </div>
         </div>
-      )}
+      </div>
     </section>
   );
 }

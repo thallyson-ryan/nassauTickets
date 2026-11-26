@@ -36,7 +36,7 @@ export default function Relatorios() {
   return (
     <section aria-labelledby="r-titulo">
       <h3 id="r-titulo">Relatórios</h3>
-      <form className="linha" onSubmit={(e) => e.preventDefault()}>
+      <form className="cartao linha" onSubmit={(e) => e.preventDefault()}>
         <label>
           Período{' '}
           <select name="periodo" value={filtro.periodo} onChange={alterar}>
